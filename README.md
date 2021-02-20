@@ -28,7 +28,7 @@ This repository requires a number of python modules that are not statndard libra
 
 ## Required Configuration
 
-Within the [restapi_example](restapi_example.py) you will find the following items that need to be defined.
+Within the [restapi_example.py](restapi_example.py) you will find the following items that need to be defined.
 
 - baseURL - The base URL for the Code Insight Server
 - authToken - The JWT token for the Code Insight user that is executing the script
