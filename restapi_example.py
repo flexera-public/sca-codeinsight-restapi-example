@@ -35,12 +35,14 @@ def main():
     baseURL = "http://localhost:8888"
     authToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZ2VhcnkiLCJ1c2VySWQiOjksImlhdCI6MTYwODU1MTIxN30.L43qItUKJv6QGH1fMC_tyGDRbqnoJU1DHECCVYODfTzLsPGlwSzWf1pZSMuOM5burXAFrrntxN6bTFbkWSn83g"
     projectName = "testproject"
-    codePath = "D:\testproject_code.zip"
+    codePath = "D:/testproject_code.zip"
 
     #projectID = create_project(projectName, baseURL, authToken)
     projectID = "39"
 
     print(projectID)
+
+    upload_project_codebase(projectID, codePath, baseURL, authToken)
 
 
 
@@ -68,20 +70,61 @@ def create_project(projectName, baseURL, authToken):
     # We at least received a response from Code Insight so check the status to see
     # what happened if there was an error or the expected data
     if response.status_code == 201:
-        logger.info("    Project created successfully")
+        logger.info("    Sucessfully created project: %s" %projectName)
+        print("Sucessfully created project: %s" %projectName)
         projectID = response.json()["id"]
         return projectID
     else: 
         logger.error("Response code %s - %s" %(response.status_code, response.text))
-        print("Response code %s - %s" %(response.status_code, response.text))
+        print("Failed to created project: %s" %projectName)
+        print("    Response code %s - %s" %(response.status_code, response.text))
         sys.exit()
     
+#----------------------------------------------------------------------#
+def upload_project_codebase(projectID, codePath, baseURL, authToken):
+    logger.debug("Entering upload_project_codebase")
 
+    # Open the zipfile to provide to open
+    try:
+        with open(codePath, mode='rb') as file: # b is important -> binary
+            projectCodeBase = file.read()
+        logger.info("Successfully opened %s" %codePath)
+    except:
+        logger.error("Failed to open %s" %codePath)
+        sys.exit()
 
+    uploadOptions = "&deleteExistingFileOnServer=true"
+    uploadOptions += "&expansionLevel=1"
 
+    RESTAPI_URL = baseURL + "/codeinsight/api/project/uploadProjectCodebase"
+    RESTAPI_URL += "?projectId=" + projectID
+    RESTAPI_URL += uploadOptions
 
+    logger.debug("    RESTAPI_URL:  %s" %RESTAPI_URL)
 
+    headers = {'Content-Type': 'application/octet-stream', 'Authorization': 'Bearer ' + authToken}  
 
+    try:
+        response = requests.post(RESTAPI_URL, headers=headers, data=projectCodeBase)
+    except requests.exceptions.RequestException as error:  # Just catch all errors
+        logger.error(error)
+        print("Failed to upload code base: %s" %codePath)
+        print("    %s" %error)
+        return
+
+    ###############################################################################
+    # We at least received a response from Code Insight so check the status to see
+    # what happened if there was an error or the expected data
+    if response.status_code == 200:
+        logger.info("    Project code base uploaded successfully")
+        print("Project code base uploaded successfully")
+        return
+
+    else: 
+        logger.error("Response code %s - %s" %(response.status_code, response.text))
+        print("Failed to upload code base: %s" %codePath)
+        print("    Response code %s - %s" %(response.status_code, response.text))
+        sys.exit()
 
 #----------------------------------------------------------------------#    
 if __name__ == "__main__":
