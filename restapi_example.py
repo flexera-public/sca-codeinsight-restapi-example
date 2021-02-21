@@ -12,6 +12,7 @@ import os
 import logging
 import requests
 import time
+import zipfile
 
 ###################################################################################
 # Test the version of python to make sure it's at least the version the script
@@ -32,28 +33,29 @@ logger = logging.getLogger(__name__)
 def main():
     
     # Configuration Options
-
     baseURL = "http://localhost:8888"
     authToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZ2VhcnkiLCJ1c2VySWQiOjksImlhdCI6MTYwODU1MTIxN30.L43qItUKJv6QGH1fMC_tyGDRbqnoJU1DHECCVYODfTzLsPGlwSzWf1pZSMuOM5burXAFrrntxN6bTFbkWSn83g"
     projectName = "testproject"
     codePath = "D:/testproject_code.zip"
 
-    #projectID = create_project(projectName, baseURL, authToken)
-    projectID = "42"
-
+    projectID = create_project(projectName, baseURL, authToken)
+ 
     upload_project_codebase(projectID, codePath, baseURL, authToken)
 
     scanTaskID = start_project_scan(projectID, baseURL, authToken)
 
     currentScanStatus = query_scan_status(scanTaskID, baseURL, authToken)
-
     # Continue to query the scan status until the scan has stopped
     while currentScanStatus not in ["completed", "terminated", "failed"]:
         time.sleep(5)
         currentScanStatus = query_scan_status(scanTaskID, baseURL, authToken)
 
-   
-
+    reportZipDataContent = generate_inventory_report(projectID, baseURL, authToken)
+    # Take the binary report data and write it to a zipfile
+    reportZipFile = open(projectName +"_inventory_report.zip", 'wb')
+    reportZipFile.write(reportZipDataContent)
+    reportZipFile.close()
+    print("%s_inventory_report.zip file is now available" %projectName)
 
 #----------------------------------------------------------------------#
 def create_project(projectName, baseURL, authToken):
@@ -196,6 +198,41 @@ def query_scan_status(scanTaskID, baseURL, authToken):
         print("Failed to get scan status for task with ID: %s" %scanTaskID)
         print("    Response code %s - %s" %(response.status_code, response.text))
         sys.exit()
+
+#----------------------------------------------------------------------#
+def generate_inventory_report(projectID, baseURL, authToken):
+    logger.debug("Entering generate_inventory_report")
+
+    reportOptions = "?reportType=Project Inventory Report"
+
+    RESTAPI_URL = baseURL + "/codeinsight/api/project/generateReport/" + reportOptions + "&projectId=" + str(projectID)
+
+    logger.debug("    RESTAPI_URL:  %s" %RESTAPI_URL)
+
+    headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + authToken} 
+
+    # Call REST API  
+    try:
+        response = requests.get(RESTAPI_URL, headers=headers)
+    except requests.exceptions.RequestException as error:  # Just catch all errors
+        logger.error(error)
+        print(error)
+        return
+
+    ###############################################################################
+    # We at least received a response from Code Insight so check the status to see
+    # what happened if there was an error or the expected data
+    if response.status_code == 200:
+        zipFileContents = response.content
+        print("Inventory Report Generated")
+        return zipFileContents
+    else: 
+        logger.error("Response code %s - %s" %(response.status_code, response.text))
+        print("Failed to get scan status for task with ID: %s" %scanTaskID)
+        print("    Response code %s - %s" %(response.status_code, response.text))
+        sys.exit()
+
+
 
 #----------------------------------------------------------------------#    
 if __name__ == "__main__":
