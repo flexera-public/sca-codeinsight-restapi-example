@@ -33,10 +33,10 @@ logger = logging.getLogger(__name__)
 def main():
     
     # Configuration Options
-    baseURL = "http://localhost:8888"
-    authToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZ2VhcnkiLCJ1c2VySWQiOjksImlhdCI6MTYwODU1MTIxN30.L43qItUKJv6QGH1fMC_tyGDRbqnoJU1DHECCVYODfTzLsPGlwSzWf1pZSMuOM5burXAFrrntxN6bTFbkWSn83g"
-    projectName = "testproject"
-    codePath = "D:/testproject_code.zip"
+    baseURL = "UPDATE ME"
+    authToken = "UPDATE ME"
+    projectName = "UPDATE ME"
+    codePath = "UPDATE ME"
 
     projectID = create_project(projectName, baseURL, authToken)
  
