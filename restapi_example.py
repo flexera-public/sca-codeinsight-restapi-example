@@ -33,10 +33,10 @@ logger = logging.getLogger(__name__)
 def main():
     
     # Configuration Options
-    baseURL = "UPDATE ME"
-    authToken = "UPDATE ME"
-    projectName = "UPDATE ME"
-    codePath = "UPDATE ME"
+    baseURL = "http://localhost:8888"
+    authToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZ2VhcnkiLCJ1c2VySWQiOjksImlhdCI6MTYwODU1MTIxN30.L43qItUKJv6QGH1fMC_tyGDRbqnoJU1DHECCVYODfTzLsPGlwSzWf1pZSMuOM5burXAFrrntxN6bTFbkWSn83g"
+    projectName = "testproject"
+    codePath = "D:/testproject_code.zip"
 
     projectID = create_project(projectName, baseURL, authToken)
  
@@ -228,7 +228,7 @@ def generate_inventory_report(projectID, baseURL, authToken):
         return zipFileContents
     else: 
         logger.error("Response code %s - %s" %(response.status_code, response.text))
-        print("Failed to get scan status for task with ID: %s" %scanTaskID)
+        print("Failed to generate Inventory Report for project: %s" %projectID)
         print("    Response code %s - %s" %(response.status_code, response.text))
         sys.exit()
 
