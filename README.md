@@ -21,7 +21,7 @@ This example application was written and tested using Code Insight version 2020R
 
 The Code Insight Cookbook should work with Python release 3.5 or greater and was tested with verison 3.8.1 specifically.
 
-This repository requires a number of python modules that are not statndard libraries.  These can be installed using the pip and the supplied [requirements.txt](requierments.txt) file as follows.
+This repository requires a number of python modules that are not statndard libraries.  These can be installed using the pip and the supplied [requirements.txt](requirements.txt) file as follows.
 
     pip install -r requirements.txt
 
@@ -30,7 +30,7 @@ This repository requires a number of python modules that are not statndard libra
 
 Within the [restapi_example.py](restapi_example.py) you will find the following items that need to be defined.
 
-- baseURL - The base URL for the Code Insight Server
+- baseURL - The base URL for the Code Insight Server i.e http://localhost:8888
 - authToken - The JWT token for the Code Insight user that is executing the script
 - projectName - The name for the project to be created
 - codePath - The path to the location of the archive file (zip/tar/tar.gz/7z)
